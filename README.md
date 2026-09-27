@@ -402,28 +402,27 @@ screenshots/
 ![Login](screenshots/login.png)
 
 ### 🧑‍🎓 Student Dashboard
-![Student Dashboard](screenshots/student-dashboard.png)
+![Student Dashboard](screenshots/students-dashboard.png)
 
 ### 👨‍🏫 Teacher Dashboard
 ![Teacher Dashboard](screenshots/teacher-dashboard.png)
 
-### 📝 Quiz Creation
-![Quiz Creation](screenshots/create-quiz.png)
+### 📝 Quizes Page
+![Quiz Creation](screenshots/quizes-page.png)
 
-### 📚 Quiz List
-![Quiz List](screenshots/quiz-list.png)
+
 
 ### 📅 Student Events
-![Student Events](screenshots/student-events.png)
+![Student Events](screenshots/join-event.png)
 
-### ⚡ Live Quiz
-![Live Quiz](screenshots/live-event.png)
+### ⚡ Explore Quiz
+![Live Quiz](screenshots/explore-quizes.png)
 
 ### 🎮 Teacher Live Event Panel
-![Teacher Live Panel](screenshots/teacher-live-panel.png)
+![Teacher Live Panel](screenshots/events.png)
 
-### 🏆 Leaderboard
-![Leaderboard](screenshots/leaderboard.png)
+### Students
+![Leaderboard](screenshots/students.png)
 
 ---
 
