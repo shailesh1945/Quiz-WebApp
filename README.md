@@ -124,7 +124,7 @@ Quiz Web App
 - JWT
 - Spring Data JPA
 - Hibernate
-- MySQL
+- PostgreSQL
 - Lombok
 - REST API
 
