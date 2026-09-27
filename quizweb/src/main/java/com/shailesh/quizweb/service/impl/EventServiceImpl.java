@@ -19,6 +19,7 @@ public class EventServiceImpl
 
     private final EventRepository eventRepository;
     private final QuizRepository quizRepository;
+    private final QuestionRepository questionRepository;
     private final RealtimeService realtimeService;
     private final ResultRepository resultRepository;
 
@@ -115,6 +116,37 @@ public class EventServiceImpl
     }
 
     @Override
+    public EventResponse getStudentEvent(Long id) {
+
+        Event event = eventRepository
+                .findById(id)
+                .orElseThrow();
+
+        if (!"LIVE".equals(event.getStatus())) {
+            throw new RuntimeException(
+                    "Event is not live"
+            );
+        }
+
+        return mapForStudent(event);
+    }
+
+    @Override
+    public List<EventResponse> studentEvents() {
+
+        return eventRepository
+                .findByStatusIn(
+                        List.of(
+                                "SCHEDULED",
+                                "LIVE"
+                        )
+                )
+                .stream()
+                .map(this::mapForStudent)
+                .toList();
+    }
+
+    @Override
     public List<EventResponse> myEvents(
             User teacher) {
 
@@ -186,6 +218,44 @@ public class EventServiceImpl
         return map(event);
     }
 
+    @Override
+    public List<StudentQuestionDto> studentQuestions(Long id) {
+
+        Event event = eventRepository
+                .findById(id)
+                .orElseThrow();
+
+        if (!"LIVE".equals(event.getStatus())) {
+            throw new RuntimeException(
+                    "Event is not live"
+            );
+        }
+
+        Quiz quiz = event.getQuiz();
+
+        return questionRepository
+                .findByQuiz(quiz)
+                .stream()
+                .map(this::mapQuestion)
+                .toList();
+    }
+
+    @Override
+    public EventResponse joinEvent(Long id) {
+
+        Event event = eventRepository
+                .findById(id)
+                .orElseThrow();
+
+        if (!"LIVE".equals(event.getStatus())) {
+            throw new RuntimeException(
+                    "Event is not live"
+            );
+        }
+
+        return mapForStudent(event);
+    }
+
     private Event ownedEvent(
             Long id,
             User teacher){
@@ -210,6 +280,20 @@ public class EventServiceImpl
                 .toUpperCase();
     }
 
+    private EventResponse mapForStudent(Event e) {
+
+        return EventResponse.builder()
+                .id(e.getId())
+                .title(e.getTitle())
+                .status(e.getStatus())
+                .startTime(
+                        e.getStartTime() != null
+                                ? e.getStartTime().toString()
+                                : null
+                )
+                .build();
+    }
+
     private EventResponse map(Event e){
         return EventResponse.builder()
                 .id(e.getId())
@@ -218,6 +302,18 @@ public class EventServiceImpl
                 .status(e.getStatus())
                 .startTime(
                         e.getStartTime().toString())
+                .build();
+    }
+
+    private StudentQuestionDto mapQuestion(Question q) {
+        return StudentQuestionDto.builder()
+                .id(q.getId())
+                .questionText(q.getQuestionText())
+                .optionA(q.getOptionA())
+                .optionB(q.getOptionB())
+                .optionC(q.getOptionC())
+                .optionD(q.getOptionD())
+                .points(q.getPoints())
                 .build();
     }
 }

@@ -10,6 +10,9 @@ import java.util.Optional;
 public interface EventRepository
         extends JpaRepository<Event, Long> {
 
+
+    List<Event> findByStatusIn(List<String> statuses);
+
     List<Event> findByTeacher(User teacher);
 
     Optional<Event> findByJoinCode(String joinCode);

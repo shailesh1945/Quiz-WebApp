@@ -48,6 +48,8 @@ public class EventController {
         );
     }
 
+
+
     @PutMapping("/teacher/events/{id}/start")
     public EventResponse start(
             @PathVariable Long id,
@@ -72,6 +74,33 @@ public class EventController {
         );
     }
 
+    @GetMapping("/student/events")
+    public List<EventResponse> studentEvents() {
+
+        return eventService.studentEvents();
+    }
+
+
+
+    @GetMapping("/student/events/{id}/questions")
+    public List<StudentQuestionDto> studentQuestions(@PathVariable Long id) {
+        return eventService.studentQuestions(id);
+    }
+
+    @GetMapping("/student/events/{id}")
+    public EventResponse studentEvent(
+            @PathVariable Long id
+    ) {
+        return eventService.getStudentEvent(id);
+    }
+
+    @PostMapping("/student/events/{id}/join")
+    public EventResponse joinEvent(
+            @PathVariable Long id
+    ) {
+        return eventService.joinEvent(id);
+    }
+
     @PostMapping("/student/events/join")
     public EventResponse join(
             @RequestBody JoinEventRequest request
@@ -80,6 +109,8 @@ public class EventController {
                 request.getJoinCode()
         );
     }
+
+
 
     @GetMapping("/teacher/events/{id}")
     public EventResponse detail(

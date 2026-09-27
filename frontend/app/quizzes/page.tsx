@@ -8,103 +8,57 @@ import Link from "next/link";
 import { Search, Pencil, Trash2, Eye } from "lucide-react";
 
 export default function QuizzesPage() {
+  const [quizzes, setQuizzes] = useState<any[]>([]);
 
-  const [quizzes, setQuizzes] =
-    useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const [loading, setLoading] =
-    useState(true);
+  const [search, setSearch] = useState("");
 
-  const [search, setSearch] =
-    useState("");
+  const [status, setStatus] = useState("ALL");
 
-  const [status, setStatus] =
-    useState("ALL");
+  const [visibility, setVisibility] = useState("ALL");
 
   useEffect(() => {
-
     loadQuizzes();
-
   }, []);
 
   const loadQuizzes = async () => {
-
     try {
+      const res = await api.get("/teacher/quizzes");
 
-      const res =
-        await api.get(
-          "/teacher/quizzes"
-        );
-
-      setQuizzes(
-        res.data.content || []
-      );
-
+      setQuizzes(res.data.content || []);
     } finally {
-
       setLoading(false);
     }
   };
 
-  const removeQuiz = async (
-    id: number
-  ) => {
+  const removeQuiz = async (id: number) => {
+    if (!confirm("Delete this quiz?")) return;
 
-    if (
-      !confirm(
-        "Delete this quiz?"
-      )
-    ) return;
-
-    await api.delete(
-      `/teacher/quizzes/${id}`
-    );
+    await api.delete(`/teacher/quizzes/${id}`);
 
     loadQuizzes();
   };
 
-  const filtered =
-    useMemo(() => {
+  const filtered = useMemo(() => {
+    return quizzes.filter((q) => {
+      const matchSearch = q.title.toLowerCase().includes(search.toLowerCase());
 
-      return quizzes.filter(
-        (q) => {
+      const matchStatus = status === "ALL" ? true : q.status === status;
 
-          const matchSearch =
-            q.title
-              .toLowerCase()
-              .includes(
-                search.toLowerCase()
-              );
+      const matchVisibility =
+        visibility === "ALL" ? true : q.visibility === visibility;
 
-          const matchStatus =
-            status === "ALL"
-              ? true
-              : q.status === status;
-
-          return (
-            matchSearch &&
-            matchStatus
-          );
-        }
-      );
-
-    }, [
-      quizzes,
-      search,
-      status
-    ]);
+      return matchSearch && matchStatus && matchVisibility;
+    });
+  }, [quizzes, search, status, visibility]);
 
   return (
     <ProtectedRoute allow={["TEACHER"]}>
-
       <DashboardLayout>
-
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-
-          <h1 className="text-4xl font-bold text-white">
-            Quizzes
-          </h1>
+          <h1 className="text-4xl font-bold text-white">Quizzes</h1>
 
           <Link
             href="/quizzes/create"
@@ -112,173 +66,128 @@ export default function QuizzesPage() {
           >
             Create Quiz
           </Link>
-
         </div>
 
         {/* Filters */}
-        <div className="grid grid-cols-3 gap-4 mb-8">
-
+        <div className="grid grid-cols-4 gap-4 mb-8">
           <div className="col-span-2 flex items-center gap-3 bg-slate-900 px-4 rounded-xl">
-
-            <Search
-              size={18}
-              className="text-slate-400"
-            />
+            <Search size={18} className="text-slate-400" />
 
             <input
               placeholder="Search quiz..."
               value={search}
-              onChange={(e) =>
-                setSearch(
-                  e.target.value
-                )
-              }
+              onChange={(e) => setSearch(e.target.value)}
               className="w-full bg-transparent py-4 text-white outline-none"
             />
-
           </div>
 
           <select
             value={status}
-            onChange={(e) =>
-              setStatus(
-                e.target.value
-              )
-            }
+            onChange={(e) => setStatus(e.target.value)}
             className="bg-slate-900 text-white px-4 rounded-xl"
           >
-            <option value="ALL">
-              All Status
-            </option>
-            <option value="DRAFT">
-              Draft
-            </option>
-            <option value="PUBLISHED">
-              Published
-            </option>
+            <option value="ALL">All Status</option>
+            <option value="DRAFT">Draft</option>
+            <option value="PUBLISHED">Published</option>
           </select>
 
+          <select
+            value={visibility}
+            onChange={(e) => setVisibility(e.target.value)}
+            className="bg-slate-900 text-white px-4 rounded-xl"
+          >
+            <option value="ALL">All Visibility</option>
+
+            <option value="PUBLIC">Public</option>
+
+            <option value="PRIVATE">Private</option>
+          </select>
         </div>
 
         {/* Loading */}
-        {loading && (
-          <p className="text-white">
-            Loading...
-          </p>
-        )}
+        {loading && <p className="text-white">Loading...</p>}
 
         {/* Empty */}
-        {!loading &&
-          filtered.length === 0 && (
-            <div className="bg-slate-900 p-10 rounded-2xl text-slate-400">
-              No quizzes found.
-            </div>
-          )}
+        {!loading && filtered.length === 0 && (
+          <div className="bg-slate-900 p-10 rounded-2xl text-slate-400">
+            No quizzes found.
+          </div>
+        )}
 
         {/* List */}
         <div className="grid gap-5">
-
           {filtered.map((quiz) => (
-
             <div
               key={quiz.id}
               className="bg-slate-900 border border-slate-800 p-6 rounded-2xl"
             >
-
               <div className="flex justify-between items-start">
-
                 <div>
-
                   <h2 className="text-2xl font-semibold text-white">
                     {quiz.title}
                   </h2>
 
-                  <p className="text-slate-400 mt-2">
-                    {
-                      quiz.description
-                    }
-                  </p>
+                  <p className="text-slate-400 mt-2">{quiz.description}</p>
 
-                  <div className="mt-4 flex gap-3 text-sm">
+                  <div className="mt-4 flex gap-3 text-sm items-center">
+                    {/* Category */}
+                    <span className="text-blue-400">{quiz.category}</span>
 
-                    <span className="text-blue-400">
-                      {
-                        quiz.category
+                    {/* Difficulty */}
+                    <span className="text-yellow-400">{quiz.difficulty}</span>
+
+                    {/* Visibility */}
+                    <span
+                      className={
+                        quiz.visibility === "PUBLIC"
+                          ? "text-green-400"
+                          : "text-purple-400"
                       }
+                    >
+                      {quiz.visibility || "PUBLIC"}
                     </span>
 
-                    <span className="text-yellow-400">
-                      {
-                        quiz.difficulty
-                      }
-                    </span>
-
+                    {/* Status */}
                     <span
                       className={`${
-                        quiz.status ===
-                        "PUBLISHED"
+                        quiz.status === "PUBLISHED"
                           ? "text-green-400"
                           : "text-slate-400"
                       }`}
                     >
-                      {
-                        quiz.status
-                      }
+                      {quiz.status}
                     </span>
-
                   </div>
-
                 </div>
 
                 {/* Actions */}
                 <div className="flex gap-2">
-
                   <Link
                     href={`/quizzes/${quiz.id}`}
                     className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700"
                   >
-                    <Eye
-                      size={18}
-                      className="text-white"
-                    />
+                    <Eye size={18} className="text-white" />
                   </Link>
 
                   <Link
                     href={`/quizzes/${quiz.id}/edit`}
                     className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700"
                   >
-                    <Pencil
-                      size={18}
-                      className="text-white"
-                    />
+                    <Pencil size={18} className="text-white" />
                   </Link>
 
                   <button
-                    onClick={() =>
-                      removeQuiz(
-                        quiz.id
-                      )
-                    }
+                    onClick={() => removeQuiz(quiz.id)}
                     className="p-3 rounded-xl bg-red-600 hover:bg-red-500"
                   >
-                    <Trash2
-                      size={18}
-                      className="text-white"
-                    />
+                    <Trash2 size={18} className="text-white" />
                   </button>
-
                 </div>
-
               </div>
-
             </div>
-
           ))}
-
         </div>
-
       </DashboardLayout>
-
     </ProtectedRoute>
   );
 }

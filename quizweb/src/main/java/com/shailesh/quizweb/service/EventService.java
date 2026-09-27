@@ -32,5 +32,15 @@ public interface EventService {
             EventRequest request
     );
 
+    EventResponse joinEvent(Long id);
+
+    List<EventResponse> studentEvents();
+
+    EventResponse getStudentEvent(Long id);
+
+    List<StudentQuestionDto> studentQuestions(Long id);
+
+
+
     List<LeaderboardDto> leaderboard(Long id);
 }
