@@ -440,29 +440,40 @@ Move into the backend directory:
 cd backend
 ```
 
-### 2. Configure MySQL
+### 2. Configure PostgreSQL
 
-Create a MySQL database:
+Create a Postgre database:
 
 ```sql
-CREATE DATABASE quizweb;
+CREATE DATABASE quizwebdb;
 ```
 
 Update the Spring Boot database configuration in:
 
 ```
-src/main/resources/application.properties
+src/main/resources/application.yml
 ```
 
 **Example:**
 
 ```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/quizweb
-spring.datasource.username=root
-spring.datasource.password=YOUR_PASSWORD
+server:
+  port: 8080
 
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/quizwebdb
+    username: postgres
+    password: postgres
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+jwt:
+  secret: mysecretkeymysecretkeymysecretkey
+  expiration: 86400000
 ```
 
 ### 3. Run the Backend
@@ -659,6 +670,6 @@ Full-Stack Quiz Web Application
 Built with:
 - Java + Spring Boot
 - Next.js + TypeScript
-- MySQL
+- PostgreSQL
 - Spring Security + JWT
 - Tailwind CSS
